@@ -1,3 +1,21 @@
+docker run -d --name zookeeper -p 2181:2181 jplock/zookeeper
+docker run -d --name kafka -p 7203:7203 -p 9092:9092 -e KAFKA_ADVERTISED_HOST_NAME=172.31.162.65 -e ZOOKEEPER_IP=172.31.162.65 ches/kafka
+docker run --rm ches/kafka kafka-topics.sh --create --topic tags --replication-factor 1 --partitions 1 --zookeeper 172.31.162.65:2181
+docker run --rm ches/kafka kafka-topics.sh --list --zookeeper 172.31.162.65:2181
+docker run --rm --interactive ches/kafka kafka-console-producer.sh --topic tags --broker-list 172.31.162.65:9092
+docker run --rm ches/kafka kafka-console-consumer.sh --topic tags --from-beginning --zookeeper 172.31.162.65:2181
+
+docker exec -it zookeeper bash
+bin/zkCli.sh -server 127.0.0.1:2181
+ls /brokers
+ls /brokers/topics
+ls /consumers
+
+
+cd .\KafkaComparer.Consumer
 docker build -t kafkacomparerconsumer:latest .
 docker run -e CONSUMER_GROUP='tags-consumers' -e TOPIC_NAME='tags' -e KAFKA_URL='172.31.162.65:9092' --rm -it kafkacomparerconsumer
 
+cd .\KafkaComparer.Consumer.Golang
+docker build -t kafkacomparerconsumer:go .
+docker run -it kafkacomparerconsumer:go

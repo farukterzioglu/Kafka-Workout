@@ -15,6 +15,7 @@ func main() {
 	config := cluster.NewConfig()
 	config.Consumer.Return.Errors = true
 	config.Group.Return.Notifications = true
+	// Config.Consumer.Offsets.Initial = sarama.OffsetOldest
 
 	// init consumer
 	brokers := []string{"172.31.162.65:9092"}
