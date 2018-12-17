@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "KafkaComparer.Consumer": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "TOPIC_NAME": "compare",
+        "KAFKA_URL": "192.168.20.180:9092,192.168.20.220:9092,192.168.20.240:9092",
+        "KAFKA_URL_": "172.31.162.65:9092",
+        "CONSUMER_GROUP": ""
+      }
+    }
+  }
+}
