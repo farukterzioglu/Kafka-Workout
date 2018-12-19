@@ -14,7 +14,7 @@ namespace KafkaComparer.Producer
 
             // https://kafka.apache.org/0110/documentation.html#producerconfigs
             var config = new ProducerConfig(){
-                //MessageMaxBytes = 3000000,
+                MessageMaxBytes = 3000000,
                 BootstrapServers = kafkaUrl
             };
 

@@ -1,0 +1,119 @@
+https://kafka.apache.org/intro
+
+- Kafka® is a distributed streaming platform
+- Publish and subscribe to streams of records, similar to a message queue.
+- The Kafka cluster stores streams of records in categories called topics.
+- Each record consists of a key, a value, and a timestamp
+
+- Tpic is feed name to which records are published. Topics are multi-subscriber; a topic can have zero, one, or many consumers
+- For each topic, Kafka maintains a partitioned log that looks like this:
+https://kafka.apache.org/21/images/log_anatomy.png
+- The records in the partitions are each assigned a sequential id number called the offset that uniquely identifies each record within the partition
+- Persists all published records (consumed or not ) for a configure period
+- Storing data for a long time is not a problem
+- Consumer can reset to an older offset or skip to start consuming from "now".
+
+----- Distribution
+- The partitions of the log are distributed over the servers.
+- Each partition is replicated across a configurable number of servers for fault tolerance.
+- Each partition has one server which acts as the "leader" and zero or more servers which act as "followers". 
+- The leader handles all read and write requests for the partition while the followers passively replicate the leader. 
+- If the leader fails, one of the followers will automatically become the new leader. 
+- Each server acts as a leader for some of its partitions and a follower for others so load is well balanced within the cluster.
+
+
+----- Producers 
+- Producers publish data to the topics of their choice. 
+- The producer is responsible for choosing which record to assign to which partition within the topic. This can be done in a round-robin fashion simply to balance load 
+- or it can be done according to some semantic partition function (say based on some key in the record)
+
+----- Consumers 
+- Consumers label themselves with a consumer group name, and each record published to a topic is delivered to one consumer instance within each subscribing consumer group. 
+- Consumer instances can be in separate processes or on separate machines.
+- If all the consumer instances have the same consumer group, then the records will be load balanced over the consumer instances.
+- If all the consumer instances have different consumer groups, then each record will be broadcast to all the consumer processes
+https://kafka.apache.org/21/images/consumer-groups.png
+- Generally topics have a small number of consumer groups, one for each "logical subscriber". 
+- Each group is composed of many consumer instances for scalability and fault tolerance. 
+- Consumption is implemented by dividing up the partitions over the consumer instances. So that each instance is the exclusive consumer of a "fair share" of partitions at any point in time. 
+- This process is handled by the Kafka protocol dynamically. 
+- If new instances join the group they will take over some partitions from other members of the group
+- if an instance dies, its partitions will be distributed to the remaining instances.
+[Photo from other web page]
+- Kafka only provides a total order over records within a partition, not between different partitions in a topic. 
+- if you require a total order over records this can be achieved with a topic that has only one partition, though this will mean only one consumer process per consumer group.
+
+
+
+----- Kafka needs ZooKeeper
+- Kafka uses Zookeeper to do leadership election of Kafka Broker and Topic Partition pairs. 
+- Zookeeper sends changes of the topology to Kafka, so each node in the cluster knows; 
+--- when a new broker joined, a broker died, a topic was removed or a topic was added
+http://cloudurable.com/images/kafka-architecture-kafka-zookeeper-coordination.png
+
+
+
+http://cloudurable.com/blog/kafka-architecture/index.html
+http://cloudurable.com/blog/kafka-architecture-topics/index.html
+
+
+https://blog.newrelic.com/engineering/kafka-best-practices/
+20 Best Practices for Working With Apache Kafka at Scale
+
+
+
+https://www.oreilly.com/library/view/kafka-the-definitive/9781491936153/ch04.html
+
+
+
+Consumer Offset Tracking
+https://kafka.apache.org/documentation/#impl_offsettracking
+
+
+
+Where to set maximum message size in Apache Kafka?
+https://stackoverflow.com/questions/50207715/where-to-set-maximum-message-size-in-apache-kafka
+
+In kafka 0.11.0 following four config options need to be set
+
+Broker config options (details) :
+message.max.bytes - The largest record batch size allowed by Kafka.
+replica.fetch.max.bytes - The number of bytes of messages to attempt to fetch for each partition.
+
+Producer config options (details) :
+max.request.size - The maximum size of a request in bytes. It is advisable to match this value with (message.max.bytes).
+
+Consumer config options (details) :
+max.partition.fetch.bytes - max number of bytes per partition returned by the server. should be larger than the max.message.size so consumer can read the largest message sent by the broker.
+
+
+https://blog.newrelic.com/engineering/new-relic-kafkapocalypse/
+
+- Producer 
+- - Ack
+- - Retry (deafult 3)
+
+
+retention (time or size)
+Seek(partition, offset)
+offsetForTimes
+
+enable.auto.commit
+auto.commit.interval.ms
+
+
+offset to db (one db transaction to inc offset atomically)
+
+
+rebalance (dublicates or mssing possibilities)
+https://www.oreilly.com/library/view/kafka-the-definitive/9781491936153/ch04.html
+
+Deserializers
+
+Assign
+
+.sh under kafka/bin 
+zookeper commands 
+
+Connectorler 
+https://www.confluent.io/hub/

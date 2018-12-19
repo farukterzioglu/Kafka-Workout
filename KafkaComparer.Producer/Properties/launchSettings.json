@@ -3,9 +3,9 @@
     "KafkaComparer.Producer": {
       "commandName": "Project",
       "environmentVariables": {
-        "TOPIC_NAME": "ProductCompareForProductEngineTopic",
-        "KAFKA_URL_": "172.31.162.65:9092",
-        "KAFKA_URL": "192.168.20.180:9092"
+        "TOPIC_NAME": "tagsPart3",
+        "KAFKA_URL": "172.31.162.65:9092",
+        "KAFKA_URL_": "192.168.20.180:9092,192.168.20.220:9092,192.168.20.240:9092"
       }
     }
   }
