@@ -80,10 +80,15 @@ namespace KafkaComparer.Consumer
                         ConsumeResult<Null, string> msg = consumer.Consume();
                         // consumer.Commit(); // Commit before processing?
 
+                        if (string.IsNullOrEmpty(msg.Value)) continue;
+
                         // Process the data
                         Console.WriteLine($"{msg.Value}\nTopic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} \n"); // TopicPartitionOffset: { msg.TopicPartitionOffset}
 
-                        // Commit
+                        if (msg.Value.Contains("crash")) throw new Exception("crash");
+                        if (msg.Value == "dont")  continue;
+                            
+                        // Commit 
                         consumer.Commit();
                     }
                     catch (ConsumeException e)

@@ -31,9 +31,10 @@ cd .\KafkaComparer.Producer
 docker build -t kafkacomparerproducer:latest .  
 docker run -e TOPIC_NAME='tags' -e KAFKA_URL='172.31.162.65:9092' --rm -it kafkacomparerproducer  
 
-# Producer & Consumer with 'kafkacat' # (https://github.com/edenhill/kafkacat)
-docker run --interactive --rm confluentinc/cp-kafkacat kafkacat -b 192.168.20.180:9092 -t tags -K: -P 
-docker run --tty --interactive --rm confluentinc/cp-kafkacat kafkacat -b 192.168.20.180:9092 -L
+# Producer & Consumer with 'kafkacat' #  
+docker run --interactive --rm confluentinc/cp-kafkacat kafkacat -b 192.168.20.180:9092 -t tags -K: -P  
+docker run --tty --interactive --rm confluentinc/cp-kafkacat kafkacat -b 192.168.20.180:9092 -L  
+https://github.com/edenhill/kafkacat  
 
 # Topic with 3 partition #
 docker run --rm ches/kafka kafka-topics.sh --create --topic tagsPart3 --replication-factor 1 --partitions 3 --zookeeper 172.31.162.65:2181  
