@@ -117,3 +117,6 @@ zookeper commands
 
 Connectorler 
 https://www.confluent.io/hub/
+
+
+https://medium.com/@itseranga/kafka-producer-with-golang-fab7348a5f9a

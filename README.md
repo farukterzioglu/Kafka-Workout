@@ -21,15 +21,20 @@ cd .\KafkaComparer.Consumer
 docker build -t kafkacomparerconsumer:latest .  
 docker run -e CONSUMER_GROUP='tags-consumers' -e TOPIC_NAME='tags' -e KAFKA_URL='172.31.162.65:9092' --rm -it kafkacomparerconsumer  
 
+# Producer with .Net Core #
+cd .\KafkaComparer.Producer  
+docker build -t kafkacomparerproducer:latest .  
+docker run -e TOPIC_NAME='tags' -e KAFKA_URL='172.31.162.65:9092' --rm -it kafkacomparerproducer  
+
 # Consumer with Golang #
 cd .\KafkaComparer.Consumer.Golang  
 docker build -t kafkacomparerconsumer:go .  
 docker run -it kafkacomparerconsumer:go  
 
-# Producer with .Net Core #
-cd .\KafkaComparer.Producer  
-docker build -t kafkacomparerproducer:latest .  
-docker run -e TOPIC_NAME='tags' -e KAFKA_URL='172.31.162.65:9092' --rm -it kafkacomparerproducer  
+# Producer with Golang #
+cd .\KafkaComparer.Producer.Golang  
+docker build -t kafkacomparerproducer:go .  
+docker run -it kafkacomparerproducer:go  
 
 # Producer & Consumer with 'kafkacat' #  
 docker run --interactive --rm confluentinc/cp-kafkacat kafkacat -b 192.168.20.180:9092 -t tags -K: -P  
