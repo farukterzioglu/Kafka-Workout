@@ -5,8 +5,6 @@ import (
 	"os"
 	"os/signal"
 
-	_ "github.com/bsm/sarama-cluster"
-
 	cluster "github.com/bsm/sarama-cluster"
 )
 
