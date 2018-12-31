@@ -4,7 +4,9 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"sync"
 
+	"github.com/Shopify/sarama"
 	cluster "github.com/bsm/sarama-cluster"
 )
 
@@ -45,15 +47,36 @@ func main() {
 	var commandEngineService *CommandEngineService
 	commandEngineService = NewCommandEngineService()
 
+	msgch := make(chan *sarama.ConsumerMessage)
+	go func(channel chan *sarama.ConsumerMessage) {
+		var wg sync.WaitGroup
+		for newMsg := range channel {
+			wg.Add(1)
+			go func(msg *sarama.ConsumerMessage) {
+				defer wg.Done()
+				request := CommandRequest{
+					Msg:        msg,
+					ResponseCh: make(chan interface{}),
+				}
+
+				commandEngineService.HandleMessage(request)
+				<-request.ResponseCh
+
+				consumer.MarkOffset(msg, "")
+			}(newMsg)
+		}
+		wg.Wait()
+	}(msgch)
+
 	// consume messages, watch signals
 	for {
 		select {
 		case msg, ok := <-consumer.Messages():
 			if ok {
-				commandEngineService.HandleMessage(msg)
-				consumer.MarkOffset(msg, "") // mark message as processed
+				msgch <- msg
 			}
 		case <-signals:
+			close(msgch)
 			return
 		}
 	}

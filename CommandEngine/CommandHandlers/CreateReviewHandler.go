@@ -10,8 +10,13 @@ import (
 type CreateReviewHandler struct{}
 
 // HandleAsync handles string message
-func (handler *CreateReviewHandler) HandleAsync(command commands.CreateReviewCommand) {
-	fmt.Printf("Review create with text : %s", command.Review.Text)
+func (handler *CreateReviewHandler) HandleAsync(request HandlerRequest) {
+	command := request.Command
+	createReviewCommand := command.(commands.CreateReviewCommand)
+
+	fmt.Printf("Review create with text : %s", createReviewCommand.Review.Text)
+
+	request.HandlerResponse <- true
 }
 
 // NewCreateReviewHandler creates and returns new 'create review' command handler
