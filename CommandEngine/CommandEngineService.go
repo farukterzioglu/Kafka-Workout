@@ -7,6 +7,7 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/farukterzioglu/KafkaComparer/CommandEngine/CommandHandlers"
 	"github.com/farukterzioglu/KafkaComparer/CommandEngine/Commands"
+	"github.com/farukterzioglu/KafkaComparer/CommandEngine/Models"
 )
 
 // CommandRequest is the request type for commands
@@ -31,15 +32,23 @@ func (service *CommandEngineService) HandleMessage(request CommandRequest) {
 	var handler commandhandlers.ICommandHandler
 	var cmd commands.ICommand
 
-	// TODO : deserialize json message (msg.Value)
-	cmd = commands.CreateReviewCommand{}
+	type commandCreatorFunc func() commandhandlers.ICommandHandler
+	commandMap := make(map[string]commandCreatorFunc)
+	commandMap["create-review"] = func() commandhandlers.ICommandHandler {
+		cmd = commands.CreateReviewCommand{
+			Review : models.Review{
+				Text : msg.Value
+			}
+		}
+		return commandhandlers.NewCreateReviewHandler()
+	}
+	commandMap["rate-review"] = func() commandhandlers.ICommandHandler {
+		cmd = commands.RateReviewCommand{}
+		return commandhandlers.NewRateReviewHandler()
+	}
 
-	switch cmd.(type) {
-	case commands.CreateReviewCommand:
-		handler = commandhandlers.NewCreateReviewHandler()
-	case commands.RateReviewCommand:
-		handler = commandhandlers.NewRateReviewHandler()
-	default:
+	ok, handler = commandMap[msgh.Topic]()
+	if !ok {
 		handler = commandhandlers.NewDefaultHandler()
 	}
 
