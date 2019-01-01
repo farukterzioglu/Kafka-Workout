@@ -14,7 +14,7 @@ func (handler *CreateReviewHandler) HandleAsync(request HandlerRequest) {
 	command := request.Command
 	createReviewCommand := command.(commands.CreateReviewCommand)
 
-	fmt.Printf("Review create with text : %s", createReviewCommand.Review.Text)
+	fmt.Printf("Review create with text : %s \n", createReviewCommand.Review.Text)
 
 	request.HandlerResponse <- true
 }

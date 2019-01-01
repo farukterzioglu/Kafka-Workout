@@ -2,13 +2,15 @@
 
 https://github.com/ches/docker-kafka
 
+Set-Variable -Name "ipAddress" -Value "192.168.1.5"
 docker run -d --name zookeeper -p 2181:2181 jplock/zookeeper  
-docker run -d --name kafka -p 7203:7203 -p 9092:9092 -e KAFKA_ADVERTISED_HOST_NAME=172.26.83.63 -e KAFKA_MESSAGE_MAX_BYTES=3000000 -e KAFKA_REPLICA_FETCH_MAX_BYTES=3100000 -e ZOOKEEPER_IP=172.26.83.63 ches/kafka  
-docker run --rm ches/kafka kafka-topics.sh --create --topic tags --replication-factor 1 --partitions 1 --zookeeper 172.26.83.63:2181  
-docker run --rm ches/kafka kafka-topics.sh --list --zookeeper 172.26.83.63:2181  
-docker run --rm --interactive ches/kafka kafka-console-producer.sh --topic create-review --broker-list 172.26.83.63:9092  
-docker run --rm ches/kafka kafka-console-consumer.sh --topic create-review --from-beginning --zookeeper 172.26.83.63:2181  
-docker run --rm --interactive ches/kafka kafka-consumer-groups.sh --new-consumer --describe --group group1 --bootstrap-server 172.31.162.65:9092
+docker run -d --name kafka -p 7203:7203 -p 9092:9092 -e KAFKA_ADVERTISED_HOST_NAME=$ipAddress -e KAFKA_MESSAGE_MAX_BYTES=3000000 -e KAFKA_REPLICA_FETCH_MAX_BYTES=3100000 -e ZOOKEEPER_IP=$ipAddress ches/kafka  
+docker run --rm ches/kafka kafka-topics.sh --create --topic tags --replication-factor 1 --partitions 1 --zookeeper ($ipAddress + ':2181')  
+docker run --rm ches/kafka kafka-topics.sh --list --zookeeper ($ipAddress + ':2181')  
+docker run --rm --interactive ches/kafka kafka-console-producer.sh --topic tags --broker-list ($ipAddress + ':9092')  
+Set-Variable -Name "ipAddress" -Value "192.168.1.5" (For a new powershell instance)  
+docker run --rm ches/kafka kafka-console-consumer.sh --topic create-review --from-beginning --zookeeper ($ipAddress + ':2181')  
+docker run --rm --interactive ches/kafka kafka-consumer-groups.sh --new-consumer --describe --group group1 --bootstrap-server (\$ipAddress + ':9092')
 
 # Check kafka instance details
 
@@ -51,3 +53,9 @@ https://github.com/edenhill/kafkacat
 # Topic with 3 partition
 
 docker run --rm ches/kafka kafka-topics.sh --create --topic tagsPart3 --replication-factor 1 --partitions 3 --zookeeper 172.31.162.65:2181
+
+# Compare Engine
+
+Reads from kafka topic and handles commands (new comment etc.) in go routines  
+docker build -f .\build\CommandEngine\Dockerfile -t command-engine:latest .
+docker run -it command-engine:latest

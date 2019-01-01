@@ -45,7 +45,7 @@ func (service *CommandEngineService) HandleMessage(request CommandRequest) {
 
 	var handlerRequest commandhandlers.HandlerRequest
 	handlerRequest = commandhandlers.HandlerRequest{
-		Command:         request,
+		Command:         cmd,
 		HandlerResponse: make(chan interface{}),
 	}
 	handler.HandleAsync(handlerRequest)
