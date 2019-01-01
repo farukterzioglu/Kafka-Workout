@@ -6,8 +6,6 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/farukterzioglu/KafkaComparer/CommandEngine/CommandHandlers"
-	"github.com/farukterzioglu/KafkaComparer/CommandEngine/Commands"
-	"github.com/farukterzioglu/KafkaComparer/CommandEngine/Models"
 )
 
 // CommandRequest is the request type for commands
@@ -16,11 +14,23 @@ type CommandRequest struct {
 	ResponseCh chan interface{}
 }
 
+type commandCreatorFunc func() commandhandlers.ICommandHandler
+
+var commandMap map[string]commandCreatorFunc
+
 // CommandEngineService is service that handles command messages
 type CommandEngineService struct{}
 
 // NewCommandEngineService returns new command engine service
 func NewCommandEngineService() *CommandEngineService {
+	commandMap = make(map[string]commandCreatorFunc)
+	commandMap["create-review"] = func() commandhandlers.ICommandHandler {
+		return commandhandlers.NewCreateReviewHandler()
+	}
+	commandMap["rate-review"] = func() commandhandlers.ICommandHandler {
+		return commandhandlers.NewRateReviewHandler()
+	}
+
 	return &CommandEngineService{}
 }
 
@@ -29,33 +39,19 @@ func (service *CommandEngineService) HandleMessage(request CommandRequest) {
 	msg := request.Msg
 	fmt.Fprintf(os.Stdout, "%s/%d/%d\t%s\t%s\n", msg.Topic, msg.Partition, msg.Offset, msg.Key, msg.Value)
 
-	var handler commandhandlers.ICommandHandler
-	var cmd commands.ICommand
-
-	type commandCreatorFunc func() commandhandlers.ICommandHandler
-	commandMap := make(map[string]commandCreatorFunc)
-	commandMap["create-review"] = func() commandhandlers.ICommandHandler {
-		cmd = commands.CreateReviewCommand{
-			Review : models.Review{
-				Text : msg.Value
-			}
-		}
-		return commandhandlers.NewCreateReviewHandler()
-	}
-	commandMap["rate-review"] = func() commandhandlers.ICommandHandler {
-		cmd = commands.RateReviewCommand{}
-		return commandhandlers.NewRateReviewHandler()
-	}
-
-	ok, handler = commandMap[msgh.Topic]()
-	if !ok {
-		handler = commandhandlers.NewDefaultHandler()
-	}
-
+	// Request
 	var handlerRequest commandhandlers.HandlerRequest
 	handlerRequest = commandhandlers.HandlerRequest{
-		Command:         cmd,
+		Command:         string(msg.Value[:]),
 		HandlerResponse: make(chan interface{}),
+	}
+
+	// Handler
+	var handler commandhandlers.ICommandHandler
+	if createHandler, ok := commandMap[msg.Topic]; ok {
+		handler = createHandler()
+	} else {
+		handler = commandhandlers.NewDefaultHandler()
 	}
 	handler.HandleAsync(handlerRequest)
 

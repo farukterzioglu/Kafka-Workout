@@ -1,10 +1,8 @@
 package commandhandlers
 
-import "github.com/farukterzioglu/KafkaComparer/CommandEngine/Commands"
-
 // HandlerRequest request model for handlers
 type HandlerRequest struct {
-	Command         commands.ICommand
+	Command         string
 	HandlerResponse chan<- interface{}
 }
 

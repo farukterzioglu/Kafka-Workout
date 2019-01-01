@@ -11,7 +11,8 @@ type RateReviewHandler struct{}
 
 // HandleAsync handles string message
 func (handler *RateReviewHandler) HandleAsync(request HandlerRequest) {
-	command := request.Command
+	// TODO : Parse command message (commands.RateReviewCommand)
+	var command interface{}
 	rateReviewCommand := command.(commands.RateReviewCommand)
 
 	fmt.Printf("Review (%d) rated with star : %d", rateReviewCommand.ReviewID, rateReviewCommand.Star)
