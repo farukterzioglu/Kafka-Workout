@@ -1,6 +1,6 @@
 package models
 
 type Review struct {
-	Text string
-	Star int
+	Text string `json:"text"`
+	Star int    `json:"star"`
 }

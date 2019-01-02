@@ -11,7 +11,7 @@ import (
 
 const (
 	broker = "172.31.162.65:9092"
-	topic  = "tagsPart3"
+	topic  = "create-review"
 )
 
 func main() {

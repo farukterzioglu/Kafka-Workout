@@ -11,6 +11,9 @@ import (
 )
 
 func main() {
+	var commandEngineService *CommandEngineService
+	commandEngineService = NewCommandEngineService()
+
 	// init (custom) config, enable errors and notifications
 	config := cluster.NewConfig()
 	config.Consumer.Return.Errors = true
@@ -19,7 +22,7 @@ func main() {
 
 	// init consumer
 	brokers := []string{"172.31.162.65:9092"}
-	topics := []string{"tagsPart3"}
+	topics := commandEngineService.GetTopicList()
 	consumer, err := cluster.NewConsumer(brokers, "tags-go-consumers", topics, config)
 	if err != nil {
 		panic(err)
@@ -43,9 +46,6 @@ func main() {
 			log.Printf("Rebalanced: %+v\n", ntf)
 		}
 	}()
-
-	var commandEngineService *CommandEngineService
-	commandEngineService = NewCommandEngineService()
 
 	msgch := make(chan *sarama.ConsumerMessage)
 	go func(channel chan *sarama.ConsumerMessage) {

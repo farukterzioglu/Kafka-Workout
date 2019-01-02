@@ -34,6 +34,18 @@ func NewCommandEngineService() *CommandEngineService {
 	return &CommandEngineService{}
 }
 
+func (service *CommandEngineService) GetTopicList () []string{
+	keys := make([]string, len(commandMap))
+
+	i := 0
+	for k := range commandMap {
+		keys[i] = k
+		i++
+	}
+
+	return keys
+}
+
 // HandleMessage handles consumed command message
 func (service *CommandEngineService) HandleMessage(request CommandRequest) {
 	msg := request.Msg
@@ -42,7 +54,7 @@ func (service *CommandEngineService) HandleMessage(request CommandRequest) {
 	// Request
 	var handlerRequest commandhandlers.HandlerRequest
 	handlerRequest = commandhandlers.HandlerRequest{
-		Command:         string(msg.Value[:]),
+		Command:         msg.Value,
 		HandlerResponse: make(chan interface{}),
 	}
 

@@ -2,7 +2,7 @@ package commandhandlers
 
 // HandlerRequest request model for handlers
 type HandlerRequest struct {
-	Command         string
+	Command         []byte
 	HandlerResponse chan<- interface{}
 }
 

@@ -1,6 +1,7 @@
 package commandhandlers
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/farukterzioglu/KafkaComparer/CommandEngine/Commands"
@@ -11,9 +12,8 @@ type RateReviewHandler struct{}
 
 // HandleAsync handles string message
 func (handler *RateReviewHandler) HandleAsync(request HandlerRequest) {
-	// TODO : Parse command message (commands.RateReviewCommand)
-	var command interface{}
-	rateReviewCommand := command.(commands.RateReviewCommand)
+	var rateReviewCommand  commands.RateReviewCommand
+	json.Unmarshal(request.Command, &rateReviewCommand )
 
 	fmt.Printf("Review (%d) rated with star : %d", rateReviewCommand.ReviewID, rateReviewCommand.Star)
 
