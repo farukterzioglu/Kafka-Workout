@@ -1,5 +1,7 @@
 package commandhandlers
 
+import "context"
+
 // HandlerRequest request model for handlers
 type HandlerRequest struct {
 	Command         []byte
@@ -8,5 +10,5 @@ type HandlerRequest struct {
 
 // ICommandHandler interface for command handlers
 type ICommandHandler interface {
-	HandleAsync(request HandlerRequest)
+	HandleAsync(ctx context.Context, request HandlerRequest)
 }

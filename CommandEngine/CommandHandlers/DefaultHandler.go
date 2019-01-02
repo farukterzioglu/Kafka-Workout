@@ -1,6 +1,7 @@
 package commandhandlers
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -8,7 +9,7 @@ import (
 type DefaultHandler struct{}
 
 // HandleAsync handles string message
-func (handler *DefaultHandler) HandleAsync(request HandlerRequest) {
+func (handler *DefaultHandler) HandleAsync(ctx context.Context, request HandlerRequest) {
 	command := request.Command
 	fmt.Printf("Command text : %s", command)
 

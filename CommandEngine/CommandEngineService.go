@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"context"
 
 	"github.com/Shopify/sarama"
 	"github.com/farukterzioglu/KafkaComparer/CommandEngine/CommandHandlers"
@@ -34,7 +33,7 @@ func NewCommandEngineService() *CommandEngineService {
 	return &CommandEngineService{}
 }
 
-func (service *CommandEngineService) GetTopicList () []string{
+func (service *CommandEngineService) getTopicList() []string {
 	keys := make([]string, len(commandMap))
 
 	i := 0
@@ -47,9 +46,9 @@ func (service *CommandEngineService) GetTopicList () []string{
 }
 
 // HandleMessage handles consumed command message
-func (service *CommandEngineService) HandleMessage(request CommandRequest) {
+func (service *CommandEngineService) HandleMessage(ctx context.Context, request CommandRequest) {
 	msg := request.Msg
-	fmt.Fprintf(os.Stdout, "%s/%d/%d\t%s\t%s\n", msg.Topic, msg.Partition, msg.Offset, msg.Key, msg.Value)
+	// fmt.Fprintf(os.Stdout, "%s/%d/%d\t%s\t%s\n", msg.Topic, msg.Partition, msg.Offset, msg.Key, msg.Value)
 
 	// Request
 	var handlerRequest commandhandlers.HandlerRequest
@@ -65,7 +64,7 @@ func (service *CommandEngineService) HandleMessage(request CommandRequest) {
 	} else {
 		handler = commandhandlers.NewDefaultHandler()
 	}
-	handler.HandleAsync(handlerRequest)
+	handler.HandleAsync(ctx, handlerRequest)
 
 	request.ResponseCh <- handlerRequest.HandlerResponse
 }

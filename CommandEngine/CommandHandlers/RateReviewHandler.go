@@ -1,6 +1,7 @@
 package commandhandlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -11,9 +12,9 @@ import (
 type RateReviewHandler struct{}
 
 // HandleAsync handles string message
-func (handler *RateReviewHandler) HandleAsync(request HandlerRequest) {
-	var rateReviewCommand  commands.RateReviewCommand
-	json.Unmarshal(request.Command, &rateReviewCommand )
+func (handler *RateReviewHandler) HandleAsync(ctx context.Context, request HandlerRequest) {
+	var rateReviewCommand commands.RateReviewCommand
+	json.Unmarshal(request.Command, &rateReviewCommand)
 
 	fmt.Printf("Review (%d) rated with star : %d", rateReviewCommand.ReviewID, rateReviewCommand.Star)
 

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -8,6 +10,7 @@ import (
 
 	"github.com/Shopify/sarama"
 	cluster "github.com/bsm/sarama-cluster"
+	"github.com/farukterzioglu/KafkaComparer/CommandEngine/Models"
 )
 
 func main() {
@@ -22,7 +25,7 @@ func main() {
 
 	// init consumer
 	brokers := []string{"172.31.162.65:9092"}
-	topics := commandEngineService.GetTopicList()
+	topics := commandEngineService.getTopicList()
 	consumer, err := cluster.NewConsumer(brokers, "tags-go-consumers", topics, config)
 	if err != nil {
 		panic(err)
@@ -54,12 +57,24 @@ func main() {
 			wg.Add(1)
 			go func(msg *sarama.ConsumerMessage) {
 				defer wg.Done()
+
+				var (
+					ctx    context.Context
+					cancel context.CancelFunc
+				)
+				ctx, cancel = context.WithCancel(context.Background())
+				defer cancel()
+
 				request := CommandRequest{
 					Msg:        msg,
 					ResponseCh: make(chan interface{}),
 				}
 
-				commandEngineService.HandleMessage(request)
+				commandEngineService.HandleMessage(ctx, request)
+
+				reviewID := models.ReviewIdFromContext(ctx)
+				fmt.Printf("Review id : %s\n", reviewID)
+
 				<-request.ResponseCh
 
 				consumer.MarkOffset(msg, "")
