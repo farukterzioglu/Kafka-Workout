@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package reviewservice;
+
+service ReviewService {
+    rpc SaveReview(NewReviewRequest) returns (ReviewId) {}
+    rpc GetTopReviews(GetTopReviewsRequest) returns (stream Review) {}
+}
+
+message Review {
+    string Text = 1;
+    int32 Star = 2;
+}
+
+message NewReviewRequest {
+    Review review = 1;
+}
+   
+message ReviewId {
+    int32 reviewId = 1;
+}
+
+message GetTopReviewsRequest {
+    int32 count = 1;
+}
