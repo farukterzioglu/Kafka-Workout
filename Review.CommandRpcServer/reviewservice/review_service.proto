@@ -18,7 +18,7 @@ message NewReviewRequest {
 }
    
 message ReviewId {
-    int32 reviewId = 1;
+    string reviewId = 1;
 }
 
 message GetTopReviewsRequest {

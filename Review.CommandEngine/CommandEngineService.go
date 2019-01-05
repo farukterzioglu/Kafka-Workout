@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/Shopify/sarama"
-	"github.com/farukterzioglu/KafkaComparer/CommandEngine/CommandHandlers"
+	"github.com/farukterzioglu/KafkaComparer/Review.CommandEngine/CommandHandlers"
+
+	pb "github.com/farukterzioglu/KafkaComparer/Review.CommandRpcServer/reviewservice"
 )
 
 // CommandRequest is the request type for commands
@@ -18,19 +20,23 @@ type commandCreatorFunc func() commandhandlers.ICommandHandler
 var commandMap map[string]commandCreatorFunc
 
 // CommandEngineService is service that handles command messages
-type CommandEngineService struct{}
+type CommandEngineService struct {
+	client *pb.ReviewServiceClient
+}
 
 // NewCommandEngineService returns new command engine service
-func NewCommandEngineService() *CommandEngineService {
+func NewCommandEngineService(c pb.ReviewServiceClient) *CommandEngineService {
 	commandMap = make(map[string]commandCreatorFunc)
 	commandMap["create-review"] = func() commandhandlers.ICommandHandler {
-		return commandhandlers.NewCreateReviewHandler()
+		return commandhandlers.NewCreateReviewHandler(c)
 	}
 	commandMap["rate-review"] = func() commandhandlers.ICommandHandler {
 		return commandhandlers.NewRateReviewHandler()
 	}
 
-	return &CommandEngineService{}
+	return &CommandEngineService{
+		client: c,
+	}
 }
 
 func (service *CommandEngineService) getTopicList() []string {

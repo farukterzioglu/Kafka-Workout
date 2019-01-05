@@ -6,6 +6,7 @@ import "context"
 type HandlerRequest struct {
 	Command         []byte
 	HandlerResponse chan<- interface{}
+	ErrResponse     chan<- error
 }
 
 // ICommandHandler interface for command handlers

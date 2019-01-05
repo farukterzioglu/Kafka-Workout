@@ -10,7 +10,7 @@ import (
 
 	"github.com/Shopify/sarama"
 	cluster "github.com/bsm/sarama-cluster"
-	"github.com/farukterzioglu/KafkaComparer/CommandEngine/Models"
+	"github.com/farukterzioglu/KafkaComparer/Review.CommandEngine/Models"
 )
 
 func main() {
