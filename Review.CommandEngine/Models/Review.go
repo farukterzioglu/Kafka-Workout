@@ -9,7 +9,7 @@ const reviewIDKey key = "reviewIDKey"
 // Review struct
 type Review struct {
 	Text string `json:"text"`
-	Star int    `json:"star"`
+	Star int8   `json:"star"`
 }
 
 // NewContext returns a new Context that carries a provided review id value

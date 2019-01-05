@@ -3,6 +3,7 @@ package commandrpcserver
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/farukterzioglu/KafkaComparer/Review.CommandEngine/Models"
 	pb "github.com/farukterzioglu/KafkaComparer/Review.CommandRpcServer/reviewservice"
@@ -19,6 +20,34 @@ func (server *CommandServer) SaveReview(ctx context.Context, review *pb.Review) 
 	// TODO : save the review
 
 	return &pb.ReviewId{ReviewId: 0}, nil
+}
+
+// SaveReviews handles SaveReviews rpc command
+func (server *CommandServer) SaveReviews(ctx context.Context, stream pb.ReviewService_SaveReviewsServer) error {
+	for {
+		request, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+
+		var review models.Review
+		review = models.Review{
+			Text: request.Review.Text,
+			Star: int8(request.Review.Star),
+		}
+		fmt.Printf("Received review with text : %s\n", review.Text)
+
+		var reviewId int32
+		// TODO : Process review
+		reviewId = -1
+
+		if err := stream.Send(&pb.ReviewId{ReviewId: reviewId}); err != nil {
+			return err
+		}
+	}
 }
 
 // GetTopReviews returns top 'GetTopReviewsRequest.count' reviews

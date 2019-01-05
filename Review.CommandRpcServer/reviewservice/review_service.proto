@@ -4,6 +4,7 @@ package reviewservice;
 
 service ReviewService {
     rpc SaveReview(NewReviewRequest) returns (ReviewId) {}
+    rpc SaveReviews(stream NewReviewRequest) returns (stream ReviewId) {}
     rpc GetTopReviews(GetTopReviewsRequest) returns (stream Review) {}
 }
 
