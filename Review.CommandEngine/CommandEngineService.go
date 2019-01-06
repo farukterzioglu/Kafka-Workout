@@ -13,6 +13,7 @@ import (
 type CommandRequest struct {
 	Msg        *sarama.ConsumerMessage
 	ResponseCh chan interface{}
+	ErrCh      chan error
 }
 
 type commandCreatorFunc func() commandhandlers.ICommandHandler
@@ -25,7 +26,7 @@ type CommandEngineService struct {
 }
 
 // NewCommandEngineService returns new command engine service
-func NewCommandEngineService(c pb.ReviewServiceClient) *CommandEngineService {
+func NewCommandEngineService(c *pb.ReviewServiceClient) *CommandEngineService {
 	commandMap = make(map[string]commandCreatorFunc)
 	commandMap["create-review"] = func() commandhandlers.ICommandHandler {
 		return commandhandlers.NewCreateReviewHandler(c)
@@ -72,5 +73,11 @@ func (service *CommandEngineService) HandleMessage(ctx context.Context, request 
 	}
 	handler.HandleAsync(ctx, handlerRequest)
 
-	request.ResponseCh <- handlerRequest.HandlerResponse
+	select {
+	case resp := <-handlerRequest.HandlerResponse:
+		request.ResponseCh <- resp
+	case err := <-handlerRequest.ErrResponse:
+		request.ErrCh <- err
+	}
+	// TODO : case when context canceled
 }

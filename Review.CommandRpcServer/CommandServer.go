@@ -28,7 +28,7 @@ func (server *CommandServer) SaveReview(ctx context.Context, request *pb.NewRevi
 		Star: int8(request.Review.Star),
 	}
 
-	fmt.Printf("Got a new review : %s (%d) \n", review.Text, review.Star)
+	fmt.Printf("Got a new review : %s (%d star) \n", review.Text, review.Star)
 
 	// TODO : save the review
 

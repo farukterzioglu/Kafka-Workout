@@ -5,8 +5,8 @@ import "context"
 // HandlerRequest request model for handlers
 type HandlerRequest struct {
 	Command         []byte
-	HandlerResponse chan<- interface{}
-	ErrResponse     chan<- error
+	HandlerResponse chan interface{}
+	ErrResponse     chan error
 }
 
 // ICommandHandler interface for command handlers

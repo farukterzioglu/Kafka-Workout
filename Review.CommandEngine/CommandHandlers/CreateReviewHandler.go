@@ -17,9 +17,9 @@ type CreateReviewHandler struct {
 }
 
 // NewCreateReviewHandler creates and returns new 'create review' command handler
-func NewCreateReviewHandler(c pb.ReviewServiceClient) *CreateReviewHandler {
+func NewCreateReviewHandler(c *pb.ReviewServiceClient) *CreateReviewHandler {
 	return &CreateReviewHandler{
-		client: c,
+		client: *c,
 	}
 }
 
