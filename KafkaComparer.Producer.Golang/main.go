@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -9,12 +10,16 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-const (
-	broker = "172.31.162.65:9092"
-	topic  = "create-review"
+var (
+	topicName    = flag.String("topic_name", "", "Name of topic to publish")
+	kafkaBrokers = flag.String("kafka_brokers", "localhost:9092", "The kafka broker address in the format of host:port")
 )
 
 func main() {
+	flag.Parse()
+	fmt.Printf("Broker address : %s\n", *kafkaBrokers)
+	fmt.Printf("Topic name : %s\n", *topicName)
+
 	producer, err := initProducer()
 	if err != nil {
 		fmt.Println("Error while creating producer : ", err.Error())
@@ -34,19 +39,19 @@ func initProducer() (producer sarama.SyncProducer, err error) {
 	sarama.Logger = log.New(os.Stdout, "", log.Ltime)
 
 	config := sarama.NewConfig()
-	config.ClientID = "tagsProducer"
+	config.ClientID = "SampleProducer"
 	config.Producer.Retry.Max = 5
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Return.Successes = true
 
-	producer, err = sarama.NewSyncProducer([]string{broker}, config)
+	producer, err = sarama.NewSyncProducer([]string{*kafkaBrokers}, config)
 
 	return
 }
 
 func publish(message string, producer sarama.SyncProducer) {
 	msg := &sarama.ProducerMessage{
-		Topic: topic,
+		Topic: *topicName,
 		Value: sarama.StringEncoder(message),
 	}
 

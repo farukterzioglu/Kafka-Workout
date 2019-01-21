@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -9,7 +10,15 @@ import (
 	cluster "github.com/bsm/sarama-cluster"
 )
 
+var (
+	topicName    = flag.String("topic_name", "", "Name of topic to publish")
+	kafkaBrokers = flag.String("kafka_brokers", "172.24.96.1:9092", "The kafka broker address in the format of host:port")
+)
+
 func main() {
+	flag.Parse()
+	fmt.Printf("Broker address : %s\n", *kafkaBrokers)
+	fmt.Printf("Topic name : %s\n", *topicName)
 
 	// init (custom) config, enable errors and notifications
 	config := cluster.NewConfig()
@@ -18,8 +27,9 @@ func main() {
 	// Config.Consumer.Offsets.Initial = sarama.OffsetOldest
 
 	// init consumer
-	brokers := []string{"172.31.162.65:9092"}
-	topics := []string{"tagsPart3"}
+	// TODO : Support multiple broker list
+	brokers := []string{*kafkaBrokers}
+	topics := []string{*topicName}
 	consumer, err := cluster.NewConsumer(brokers, "tags-go-consumers", topics, config)
 	if err != nil {
 		panic(err)
