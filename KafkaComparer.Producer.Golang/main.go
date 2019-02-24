@@ -2,22 +2,35 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/Shopify/sarama"
+	kitlog "github.com/go-kit/kit/log"
 )
 
-const (
-	broker = "172.31.162.65:9092"
-	topic  = "create-review"
+var (
+	kafkaBrokers = flag.String("kafka_brokers", "localhost:9092", "The kafka broker address in the format of host:port")
 )
+
+const topic = "commands"
 
 func main() {
+	var logger kitlog.Logger
+	{
+		logger = kitlog.NewLogfmtLogger(os.Stderr)
+		logger = kitlog.With(logger, "ts", kitlog.DefaultTimestampUTC)
+		logger = kitlog.With(logger, "caller", "Kafka producer")
+	}
+
+	flag.Parse()
+	logger.Log("Broker address", *kafkaBrokers)
+
 	producer, err := initProducer()
 	if err != nil {
-		fmt.Println("Error while creating producer : ", err.Error())
+		logger.Log("Error while creating producer", err.Error())
 		os.Exit(1)
 	}
 
@@ -39,7 +52,7 @@ func initProducer() (producer sarama.SyncProducer, err error) {
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Return.Successes = true
 
-	producer, err = sarama.NewSyncProducer([]string{broker}, config)
+	producer, err = sarama.NewSyncProducer([]string{*kafkaBrokers}, config)
 
 	return
 }

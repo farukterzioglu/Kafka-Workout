@@ -261,3 +261,6 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+KafkaComparer.Consumer.Golang/KafkaComparer.Consumer.Golang
+KafkaComparer.Consumer.Golang/main
+KafkaComparer.Producer.Golang/KafkaComparer.Producer.Golang

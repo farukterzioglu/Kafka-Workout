@@ -4,7 +4,8 @@ RUN go version
 COPY . /go/src/github.com/farukterzioglu/kafka-go/
 WORKDIR /go/src/github.com/farukterzioglu/kafka-go/
 RUN set -x && \
-    go get github.com/bsm/sarama-cluster 
+    go get github.com/bsm/sarama-cluster && \
+    go get github.com/go-kit/kit/log
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o app .
 
