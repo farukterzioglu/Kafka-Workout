@@ -40,16 +40,26 @@ ls /consumers
 
 ```
 cd .\KafkaComparer.Consumer  
+$ HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
+$ export TOPIC_NAME=commands  KAFKA_URL=$HOSTIP CONSUMER_GROUP=commands-consumers
+
+dotnet run .
+
 docker build -t kafkacomparerconsumer:latest .`  
-docker run -e CONSUMER_GROUP='tags-consumers' -e TOPIC_NAME='tags' -e KAFKA_URL='172.31.162.65:9092' --rm -it kafkacomparerconsumer
+$ docker run -e CONSUMER_GROUP=$CONSUMER_GROUP -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkacomparerconsumer
 ```
 
 ### Producer with .Net Core
 
 ```
 cd .\KafkaComparer.Producer  
+$ HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
+$ export TOPIC_NAME=commands  KAFKA_URL=$HOSTIP
+
+dotnet run .
+
 docker build -t kafkacomparerproducer:latest .
-docker run -e TOPIC_NAME='tags' -e KAFKA_URL='172.31.162.65:9092' --rm -it kafkacomparerproducer
+$ docker run -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkacomparerproducer
 ```
 
 ### Consumer with Golang
