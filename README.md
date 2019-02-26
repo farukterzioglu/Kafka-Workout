@@ -1,4 +1,4 @@
-# Start Kafka & Zookeper
+### Start Kafka & Zookeper
   
 ```
 $ docker-compose up
@@ -26,7 +26,7 @@ docker run --rm --interactive ches/kafka kafka-consumer-groups.sh --new-consumer
 ```
 Reference: https://github.com/ches/docker-kafka  
 
-# Check kafka instance details
+### Check kafka instance details
 
 ```
 docker exec -it zookeeper bash
@@ -36,7 +36,7 @@ ls /brokers/topics
 ls /consumers
 ```
 
-# Consumer with .Net Core
+### Consumer with .Net Core
 
 ```
 cd .\KafkaComparer.Consumer  
@@ -44,7 +44,7 @@ docker build -t kafkacomparerconsumer:latest .`
 docker run -e CONSUMER_GROUP='tags-consumers' -e TOPIC_NAME='tags' -e KAFKA_URL='172.31.162.65:9092' --rm -it kafkacomparerconsumer
 ```
 
-# Producer with .Net Core
+### Producer with .Net Core
 
 ```
 cd .\KafkaComparer.Producer  
@@ -52,33 +52,35 @@ docker build -t kafkacomparerproducer:latest .
 docker run -e TOPIC_NAME='tags' -e KAFKA_URL='172.31.162.65:9092' --rm -it kafkacomparerproducer
 ```
 
-# Consumer with Golang
+### Consumer with Golang
 
 ```
+$ HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
 $ cd ./KafkaComparer.Consumer.Golang
-go run . -kafka_brokers="localhost:9092" -group_id="test"
+$ go run . -kafka_brokers=$HOSTIP:9092 -group_id="test"
 
-docker build -t kafkacomparerconsumer:go .  
-docker run -it kafkacomparerconsumer:go -kafka_brokers="localhost:9092" -group_id="test"
+docker build -t kafkacomparerconsumer:go .
+$ docker run -it kafkacomparerconsumer:go -kafka_brokers=$HOSTIP:9092 -group_id="test"
 ```  
 
-# Producer with Golang
+### Producer with Golang
 
 ```
+$ HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
 $ cd ./KafkaComparer.Producer.Golang
-go run . -kafka_brokers="localhost:9092"
+$ go run . -kafka_brokers=$HOSTIP:9092
   
 docker build -t kafkacomparerproducer:go .  
-docker run -it kafkacomparerproducer:go -kafka_brokers="localhost:9092"
+$ docker run -it kafkacomparerproducer:go -kafka_brokers=$HOSTIP:9092
 ```
 
-# Producer & Consumer with 'kafkacat'
+### Producer & Consumer with 'kafkacat'
 
 ```
 docker run --interactive --rm confluentinc/cp-kafkacat kafkacat -b 192.168.20.180:9092 -t tags -K: -P  
 docker run --tty --interactive --rm confluentinc/cp-kafkacat kafkacat -b 192.168.20.180:9092 -L https://github.com/edenhill/kafkacat
 ```
 
-# Topic with 3 partition
+### Topic with 3 partition
 
 `docker run --rm ches/kafka kafka-topics.sh --create --topic tagsPart3 --replication-factor 1 --partitions 3 --zookeeper 172.31.162.65:2181`

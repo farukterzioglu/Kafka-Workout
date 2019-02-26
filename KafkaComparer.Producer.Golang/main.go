@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/Shopify/sarama"
 	kitlog "github.com/go-kit/kit/log"
@@ -38,8 +39,17 @@ func main() {
 	for {
 		fmt.Print("Enter message: ")
 		msg, _ := reader.ReadString('\n')
+		msg = strings.TrimSuffix(msg, "\n")
 
-		publish(msg, producer)
+		values := strings.Split(msg, "-")
+
+		key := ""
+		if len(values) > 1 {
+			key = values[1]
+		}
+
+		fmt.Printf("Key: %s, Value: %s\n", key, values[0])
+		publish(msg, key, producer)
 	}
 }
 
@@ -57,10 +67,19 @@ func initProducer() (producer sarama.SyncProducer, err error) {
 	return
 }
 
-func publish(message string, producer sarama.SyncProducer) {
-	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.StringEncoder(message),
+func publish(message, key string, producer sarama.SyncProducer) {
+	var msg *sarama.ProducerMessage
+	if len(key) != 0 {
+		msg = &sarama.ProducerMessage{
+			Topic: topic,
+			Key:   sarama.StringEncoder(key),
+			Value: sarama.StringEncoder(message),
+		}
+	} else {
+		msg = &sarama.ProducerMessage{
+			Topic: topic,
+			Value: sarama.StringEncoder(message),
+		}
 	}
 
 	p, o, err := producer.SendMessage(msg)
