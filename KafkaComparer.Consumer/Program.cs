@@ -50,7 +50,7 @@ namespace KafkaComparer.Consumer
                 MessageMaxBytes = 4000000,
             };
 
-            using (var consumer = new Consumer<Null, string>(config))
+            using (var consumer = new Consumer<string, string>(config))
             {
                 bool consuming = true;
                 consumer.OnError += (_, e) => {
@@ -77,13 +77,13 @@ namespace KafkaComparer.Consumer
                     try
                     {
                         // Get data 
-                        ConsumeResult<Null, string> msg = consumer.Consume();
+                        ConsumeResult<string, string> msg = consumer.Consume();
                         // consumer.Commit(); // Commit before processing?
 
                         if (string.IsNullOrEmpty(msg.Value)) continue;
 
                         // Process the data
-                        Console.WriteLine($"{msg.Value}\nTopic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} \n"); // TopicPartitionOffset: { msg.TopicPartitionOffset}
+                        Console.WriteLine($"{msg.Value}{(!string.IsNullOrEmpty(msg.Key) ?  " - " + msg.Key : "") } | Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset}"); // TopicPartitionOffset: { msg.TopicPartitionOffset}
 
                         if (msg.Value.Contains("crash")) throw new Exception("crash");
                         if (msg.Value == "dont")  continue;

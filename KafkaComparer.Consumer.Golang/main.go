@@ -8,17 +8,26 @@ import (
 	"os/signal"
 
 	cluster "github.com/bsm/sarama-cluster"
+	kitlog "github.com/go-kit/kit/log"
 )
 
 var (
-	topicName    = flag.String("topic_name", "", "Name of topic to publish")
-	kafkaBrokers = flag.String("kafka_brokers", "172.24.96.1:9092", "The kafka broker address in the format of host:port")
+	kafkaBrokers = flag.String("kafka_brokers", "localhost:9092", "The kafka broker address in the format of host:port")
+	groupID      = flag.String("group_id", "kafka-consumer", "Consumer group id")
 )
 
+const topic = "commands"
+
 func main() {
+	var logger kitlog.Logger
+	{
+		logger = kitlog.NewLogfmtLogger(os.Stderr)
+		logger = kitlog.With(logger, "ts", kitlog.DefaultTimestampUTC)
+		logger = kitlog.With(logger, "caller", "Kafka producer")
+	}
+
 	flag.Parse()
-	fmt.Printf("Broker address : %s\n", *kafkaBrokers)
-	fmt.Printf("Topic name : %s\n", *topicName)
+	logger.Log("Broker address", *kafkaBrokers)
 
 	// init (custom) config, enable errors and notifications
 	config := cluster.NewConfig()
@@ -27,10 +36,9 @@ func main() {
 	// Config.Consumer.Offsets.Initial = sarama.OffsetOldest
 
 	// init consumer
-	// TODO : Support multiple broker list
 	brokers := []string{*kafkaBrokers}
-	topics := []string{*topicName}
-	consumer, err := cluster.NewConsumer(brokers, "tags-go-consumers", topics, config)
+	topics := []string{topic}
+	consumer, err := cluster.NewConsumer(brokers, "go-consumers", topics, config)
 	if err != nil {
 		panic(err)
 	}

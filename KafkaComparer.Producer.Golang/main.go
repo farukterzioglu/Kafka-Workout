@@ -6,23 +6,32 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/Shopify/sarama"
+	kitlog "github.com/go-kit/kit/log"
 )
 
 var (
-	topicName    = flag.String("topic_name", "", "Name of topic to publish")
 	kafkaBrokers = flag.String("kafka_brokers", "localhost:9092", "The kafka broker address in the format of host:port")
 )
 
+const topic = "commands"
+
 func main() {
+	var logger kitlog.Logger
+	{
+		logger = kitlog.NewLogfmtLogger(os.Stderr)
+		logger = kitlog.With(logger, "ts", kitlog.DefaultTimestampUTC)
+		logger = kitlog.With(logger, "caller", "Kafka producer")
+	}
+
 	flag.Parse()
-	fmt.Printf("Broker address : %s\n", *kafkaBrokers)
-	fmt.Printf("Topic name : %s\n", *topicName)
+	logger.Log("Broker address", *kafkaBrokers)
 
 	producer, err := initProducer()
 	if err != nil {
-		fmt.Println("Error while creating producer : ", err.Error())
+		logger.Log("Error while creating producer", err.Error())
 		os.Exit(1)
 	}
 
@@ -30,8 +39,17 @@ func main() {
 	for {
 		fmt.Print("Enter message: ")
 		msg, _ := reader.ReadString('\n')
+		msg = strings.TrimSuffix(msg, "\n")
 
-		publish(msg, producer)
+		values := strings.Split(msg, "-")
+
+		key := ""
+		if len(values) > 1 {
+			key = values[1]
+		}
+
+		fmt.Printf("Key: %s, Value: %s\n", key, values[0])
+		publish(msg, key, producer)
 	}
 }
 
@@ -49,10 +67,19 @@ func initProducer() (producer sarama.SyncProducer, err error) {
 	return
 }
 
-func publish(message string, producer sarama.SyncProducer) {
-	msg := &sarama.ProducerMessage{
-		Topic: *topicName,
-		Value: sarama.StringEncoder(message),
+func publish(message, key string, producer sarama.SyncProducer) {
+	var msg *sarama.ProducerMessage
+	if len(key) != 0 {
+		msg = &sarama.ProducerMessage{
+			Topic: topic,
+			Key:   sarama.StringEncoder(key),
+			Value: sarama.StringEncoder(message),
+		}
+	} else {
+		msg = &sarama.ProducerMessage{
+			Topic: topic,
+			Value: sarama.StringEncoder(message),
+		}
 	}
 
 	p, o, err := producer.SendMessage(msg)
