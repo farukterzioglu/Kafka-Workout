@@ -50,13 +50,8 @@ $ export TOPIC_NAME=commands  KAFKA_URL=$HOSTIP CONSUMER_GROUP=commands-consumer
 
 dotnet run .
 
-<<<<<<< HEAD
 docker build -t kafkaconsumer:latest .  
 $ docker run -e CONSUMER_GROUP=$CONSUMER_GROUP -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkaconsumer
-=======
-docker build -t kafkacomparerconsumer:latest .  
-$ docker run -e CONSUMER_GROUP=$CONSUMER_GROUP -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkacomparerconsumer
->>>>>>> article
 ```
 
 ### Producer with .Net Core
