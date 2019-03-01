@@ -68,3 +68,16 @@ $ cd ./KafkaComparer.Consumer
 docker build -t kafkacomparerconsumer:latest .
 $ docker run -e CONSUMER_GROUP=$CONSUMER_GROUP -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkacomparerconsumer
 ```
+
+```
+// Deploy K8S
+kubectl create -f zookeeper.yaml
+kubectl create -f kafka-service.yaml
+minikube tunnel // required to get external ip for Kafka-service
+kubectl describe svc kafka-service // Note down 'LoadBalancer Ingress' & NodePort 
+kubectl create -f kafka-broker.yaml
+
+$ docker run -e TOPIC_NAME=commands -e KAFKA_URL=10.109.196.149:9092 --rm -it kafkacomparerproducer
+
+```
+

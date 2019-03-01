@@ -1,0 +1,33 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: kafka-broker0
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka
+        id: "0"
+    spec:
+      containers:
+        - name: kafka
+          image: ches/kafka
+          ports:
+            - containerPort: 9092
+          env:
+            - name: KAFKA_MESSAGE_MAX_BYTES
+              value: "3000000"
+            - name: KAFKA_REPLICA_FETCH_MAX_BYTES
+              value: "3100000"
+            - name: ZOOKEEPER_IP
+              value: zookeeper
+            - name: KAFKA_PORT
+              value: "9092"
+            - name: KAFKA_CREATE_TOPICS
+              value: "commands:1:3"
+            - name: KAFKA_ADVERTISED_HOST_NAME
+              value: 10.109.196.149
+            - name: KAFKA_ADVERTISED_PORT
+              value: "30718"
+      terminationGracePeriodSeconds: 30
