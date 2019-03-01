@@ -5,28 +5,29 @@
 ### Start Kafka & Zookeper
   
 ```
+// Set HOSTIP env param. on evry terminal instance 
+$ HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
+
 $ docker-compose up
 $ docker run --rm ches/kafka kafka-topics.sh --list --zookeeper [host ip]:2181 // or -> 
 $ docker run --rm ches/kafka kafka-topics.sh --list --zookeeper $(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+'):2181
 ```
   
-For windows;  
 ```
-Set-Variable -Name "ipAddress" -Value "192.168.1.5"
-docker run -d --name zookeeper -p 2181:2181 jplock/zookeeper
-docker run -d --name kafka -p 7203:7203 -p 9092:9092 -e KAFKA_ADVERTISED_HOST_NAME=$ipAddress -e KAFKA_MESSAGE_MAX_BYTES=3000000 -e KAFKA_REPLICA_FETCH_MAX_BYTES=3100000 -e ZOOKEEPER_IP=$ipAddress ches/kafka
+$ docker run -d --name zookeeper -p 2181:2181 jplock/zookeeper
+$ docker run -d --name kafka -p 7203:7203 -p 9092:9092 -e ZOOKEEPER_IP=$HOSTIP ches/kafka
+// -e KAFKA_ADVERTISED_HOST_NAME=$HOSTIP -e KAFKA_MESSAGE_MAX_BYTES=3000000 -e KAFKA_REPLICA_FETCH_MAX_BYTES=3100000 
 ```
 
 ```
-docker run --rm ches/kafka kafka-topics.sh --create --topic tags --replication-factor 1 --partitions 1 --zookeeper ($ipAddress + ':2181')
-docker run --rm ches/kafka kafka-topics.sh --list --zookeeper localhost:2181
-docker run --rm --interactive ches/kafka kafka-console-producer.sh --topic tags --broker-list ($ipAddress + ':9092')
+$ docker run --rm ches/kafka kafka-topics.sh --create --topic tags --replication-factor 1 --partitions 1 --zookeeper $HOSTIP:2181
+$ docker run --rm ches/kafka kafka-topics.sh --list --zookeeper $HOSTIP:2181
+$ docker run --rm --interactive ches/kafka kafka-console-producer.sh --topic commands --broker-list $HOSTIP:9092
 
-// (From another powershell instance)  
-Set-Variable -Name "ipAddress" -Value "192.168.1.5"
+// (From another terminal)  
+$ docker run --rm ches/kafka kafka-console-consumer.sh --topic commands --from-beginning --bootstrap-server $HOSTIP:9092 --consumer-property group.id=testApp1
 
-docker run --rm ches/kafka kafka-console-consumer.sh --topic create-review --from-beginning --zookeeper ($ipAddress + ':2181')
-docker run --rm --interactive ches/kafka kafka-consumer-groups.sh --new-consumer --describe --group group1 --bootstrap-server (\$ipAddress + ':9092')
+$ docker run --rm --interactive ches/kafka kafka-consumer-groups.sh --new-consumer --describe --group testApp1 --bootstrap-server $HOSTIP:9092
 ```
 Reference: https://github.com/ches/docker-kafka  
 
@@ -43,20 +44,25 @@ ls /consumers
 ### Consumer with .Net Core
 
 ```
-cd .\KafkaComparer.Consumer  
+$ cd ./KafkaComparer.Consumer  
 $ HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
 $ export TOPIC_NAME=commands  KAFKA_URL=$HOSTIP CONSUMER_GROUP=commands-consumers
 
 dotnet run .
 
+<<<<<<< HEAD
 docker build -t kafkaconsumer:latest .  
 $ docker run -e CONSUMER_GROUP=$CONSUMER_GROUP -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkaconsumer
+=======
+docker build -t kafkacomparerconsumer:latest .  
+$ docker run -e CONSUMER_GROUP=$CONSUMER_GROUP -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkacomparerconsumer
+>>>>>>> article
 ```
 
 ### Producer with .Net Core
 
 ```
-cd .\KafkaComparer.Producer  
+$ cd ./KafkaComparer.Producer  
 $ HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
 $ export TOPIC_NAME=commands  KAFKA_URL=$HOSTIP
 
