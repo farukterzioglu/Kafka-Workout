@@ -17,9 +17,11 @@ namespace KafkaComparer.Consumer
 
             var topicName = Environment.GetEnvironmentVariable("TOPIC_NAME");
             if (string.IsNullOrEmpty(topicName)) throw new ArgumentNullException(topicName);
+            Console.WriteLine($"Topic name : {topicName}");
 
             var brokerList = Environment.GetEnvironmentVariable("KAFKA_URL");
             if (string.IsNullOrEmpty(brokerList)) throw new ArgumentNullException(brokerList);
+            Console.WriteLine($"Broker list : {brokerList}");
 
             Offset offset;
             var offSetEnvVar = Environment.GetEnvironmentVariable("OFFSET");

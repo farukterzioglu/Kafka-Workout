@@ -57,7 +57,7 @@ func initProducer() (producer sarama.SyncProducer, err error) {
 	sarama.Logger = log.New(os.Stdout, "", log.Ltime)
 
 	config := sarama.NewConfig()
-	config.ClientID = "tagsProducer"
+	config.ClientID = "SampleProducer"
 	config.Producer.Retry.Max = 5
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Return.Successes = true

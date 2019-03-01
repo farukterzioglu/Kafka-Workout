@@ -1,0 +1,22 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: kafkaconsumer
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafkaconsumer
+    spec:
+      containers:
+        - name: kafkaconsumer
+          image: kafkaconsumer:latest
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: CONSUMER_GROUP
+            value: kafka-consumer
+          - name: TOPIC_NAME
+            value: commands
+          - name: KAFKA_URL 
+            value: kafka:9092

@@ -1,0 +1,88 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: zookeeper
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: zookeeper:3.4
+          ports:
+            - containerPort: 2181
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+  labels:
+    app: zookeeper
+spec:
+  type: NodePort
+  ports:
+    - port: 2181
+      targetPort: 2181
+      nodePort: 31113
+      protocol: TCP
+  selector:
+    app: zookeeper
+--- 
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: kafka
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: ches/kafka
+          ports:
+            - containerPort: 9092
+          env:
+            - name: KAFKA_MESSAGE_MAX_BYTES
+              value: "3000000"
+            - name: KAFKA_REPLICA_FETCH_MAX_BYTES
+              value: "3100000"
+            - name: ZOOKEEPER_IP
+              value: zookeeper
+            - name: KAFKA_PORT
+              value: "9092"
+            - name: KAFKA_CREATE_TOPICS
+              value: "commands:1:1"
+            - name: KAFKA_ADVERTISED_HOST_NAME
+              value: "kafka"
+            - name: KAFKA_ADVERTISED_PORT
+              value: "9092"
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+spec:
+  type: NodePort
+  ports:
+    - port: 9092
+      targetPort: 9092
+      nodePort: 31114
+      protocol: TCP
+      name: port-1
+    - port: 7203
+      targetPort: 7203
+      nodePort: 31115
+      protocol: TCP
+      name: port-2
+  selector:
+    app: kafka
