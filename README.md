@@ -1,3 +1,7 @@
+### Deploy Kafka to K8S
+`kubectl apply -f ./deploy-kafka.yaml`
+
+
 ### Start Kafka & Zookeper
   
 ```
@@ -45,8 +49,8 @@ $ export TOPIC_NAME=commands  KAFKA_URL=$HOSTIP CONSUMER_GROUP=commands-consumer
 
 dotnet run .
 
-docker build -t kafkacomparerconsumer:latest .`  
-$ docker run -e CONSUMER_GROUP=$CONSUMER_GROUP -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkacomparerconsumer
+docker build -t kafkaconsumer:latest .  
+$ docker run -e CONSUMER_GROUP=$CONSUMER_GROUP -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkaconsumer
 ```
 
 ### Producer with .Net Core
