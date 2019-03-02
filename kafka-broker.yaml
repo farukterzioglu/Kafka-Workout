@@ -8,7 +8,6 @@ spec:
     metadata:
       labels:
         app: kafka
-        id: "0"
     spec:
       containers:
         - name: kafka
@@ -26,8 +25,8 @@ spec:
               value: "9092"
             - name: KAFKA_CREATE_TOPICS
               value: "commands:1:3"
-            - name: KAFKA_ADVERTISED_HOST_NAME
-              value: 10.109.196.149
-            - name: KAFKA_ADVERTISED_PORT
-              value: "30718"
+            # - name: KAFKA_ADVERTISED_HOST_NAME
+            #   value: 127.0.0.1
+            # - name: KAFKA_ADVERTISED_PORT
+            #   value: "30092"
       terminationGracePeriodSeconds: 30

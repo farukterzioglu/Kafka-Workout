@@ -65,19 +65,27 @@ $ docker run -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkac
 $ export TOPIC_NAME=commands  KAFKA_URL=$HOSTIP CONSUMER_GROUP=commands-consumers
 
 $ cd ./KafkaComparer.Consumer
-docker build -t kafkacomparerconsumer:latest .
+docker build -t kafkaconsumer:latest .
 $ docker run -e CONSUMER_GROUP=$CONSUMER_GROUP -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkacomparerconsumer
 ```
 
 ```
-// Deploy K8S
+// Deploy to K8S
 kubectl create -f zookeeper.yaml
 kubectl create -f kafka-service.yaml
 minikube tunnel // required to get external ip for Kafka-service
 kubectl describe svc kafka-service // Note down 'LoadBalancer Ingress' & NodePort 
 kubectl create -f kafka-broker.yaml
 
-$ docker run -e TOPIC_NAME=commands -e KAFKA_URL=10.109.196.149:9092 --rm -it kafkacomparerproducer
+$ docker run -e TOPIC_NAME=commands -e KAFKA_URL=127.0.0.1:9092 --rm -it kafkacomparerproducer
+$ docker run -e CONSUMER_GROUP=k8stest -e TOPIC_NAME=commands -e KAFKA_URL=10.110.251.182:9092 --rm -it kafkacomparerconsumer
 
+$ TOPIC_NAME=commands KAFKA_URL=10.110.251.182 dotnet run .
+
+kubectl apply -f ./KafkaComparer.Consumer/deployment.yaml
+kubectl get pods // get pod name of kafkaconsumer 
+kubectl logs -f kafkaconsumer-[***]
+
+kubectl apply -f ./KafkaComparer.Producer/deployment.yaml
 ```
 

@@ -63,8 +63,8 @@ $ export TOPIC_NAME=commands  KAFKA_URL=$HOSTIP
 
 dotnet run .
 
-docker build -t kafkacomparerproducer:latest .
-$ docker run -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkacomparerproducer
+docker build -t kafkaproducer:latest .
+$ docker run -e TOPIC_NAME=$TOPIC_NAME -e KAFKA_URL=$HOSTIP:9092 --rm -it kafkaproducer
 ```
 
 ### Consumer with Golang
@@ -99,3 +99,13 @@ docker run --tty --interactive --rm confluentinc/cp-kafkacat kafkacat -b 192.168
 ### Topic with 3 partition
 
 `docker run --rm ches/kafka kafka-topics.sh --create --topic tagsPart3 --replication-factor 1 --partitions 3 --zookeeper 172.31.162.65:2181`
+
+
+
+Notes  
+https://github.com/kubernetes/kube-deploy/issues/220  
+https://dzone.com/articles/ultimate-guide-to-installing-kafka-docker-on-kuber  
+https://github.com/kubernetes/minikube/blob/157eeeff2219afde6f085f515a5283476af6c280/docs/tunnel.md#windows  
+
+minikube start --vm-driver=none  
+minikube dashboard

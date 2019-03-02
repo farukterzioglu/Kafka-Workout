@@ -1,21 +1,19 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: kafkaconsumer
+  name: kafkaproducer
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: kafkaconsumer
+        app: kafkaproducer
     spec:
       containers:
-        - name: kafkaconsumer
-          image: kafkaconsumer:latest
+        - name: kafkaproducer
+          image: kafkaproducer:latest
           imagePullPolicy: Never
           env:
-          - name: CONSUMER_GROUP
-            value: kafka-consumer
           - name: TOPIC_NAME
             value: commands
           - name: KAFKA_URL 

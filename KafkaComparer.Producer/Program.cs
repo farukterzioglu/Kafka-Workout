@@ -32,6 +32,8 @@ namespace KafkaComparer.Producer
                 {
                     Console.Write("Enter message: ");
                     text = Console.ReadLine();
+                    if(string.IsNullOrEmpty(text)) continue;
+                    
                     try
                     {
                         var values = text.Split('-');
